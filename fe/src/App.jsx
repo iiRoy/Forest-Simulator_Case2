@@ -14,13 +14,15 @@ Plotly.newPlot('mydiv', [{
 function App() {
   let [location, setLocation] = useState("");
   let [gridSize, setGridSize] = useState(40);
-  let [probability_of_spread, setProbability] = useState(1);
+  let [probability_of_spread, setProbability] = useState(100);
   let [simSpeed,setSimSpeed] = useState(2);
   let [trees, setTrees] = useState([]);
   let [iterations, setIterations] = useState(0);
   let [burntPerc, setBurntPerc] = useState(0);
   let [density, setDensity] = useState(80);
   let [sliderGridSize, setSliderGridSize] = useState(40);
+  let [south_wind_speed, setSouthWindSpeed] = useState(0);
+  let [west_wind_speed, setWestWindSpeed] = useState(0);
 
   const burntTrees = useRef(null);
   const running = useRef(null);
@@ -33,7 +35,9 @@ function App() {
       body: JSON.stringify({ 
         dim: [sliderGridSize, sliderGridSize],
         probability_of_spread: probability_of_spread,
-        density: density / 100
+        density: density / 100,
+        south_wind_speed: south_wind_speed,
+        west_wind_speed: west_wind_speed
       })
     }).then(resp => resp.json())
     .then(data => {
@@ -56,7 +60,7 @@ function App() {
         setIterations(prev => prev + 1);
         setBurntPerc((burnt * 100).toFixed(2));
       });
-      }, 1000 / simSpeed);
+      }, 3000 / simSpeed);
   };
 
   let handleStop = () => {
@@ -89,6 +93,10 @@ function App() {
         value={probability_of_spread} onChange={setProbability} />
       <SliderField label="Density" min={0} max={100} step={10}
         value={density} onChange={setDensity} />
+      <SliderField label="South-North Wind" min={-50} max={50} step={1}
+        value={south_wind_speed} onChange={setSouthWindSpeed} />
+      <SliderField label="West-East Wind" min={-50} max={50} step={1}
+        value={west_wind_speed} onChange={setWestWindSpeed} />
       <p>Iterations: {iterations}</p> 
       <p>Burnt trees percentage: {burntPerc}%</p>
 
