@@ -1,0 +1,55 @@
+function forest_step(tree::TreeAgent, model)
+    #Solo si se está "quemando", puede quemar otros árboles.
+    if tree.status == burning
+
+        # Ver vecinos del árbol
+        for neighbor in nearby_agents(tree, model)
+            neighbor_pos = agent_pos(neighbor, model)
+            if neighbor.status == green
+                # Direccion del Viento = Sur.
+                if model.south_wind_speed > 0 && model.west_wind_speed == 0
+                    # South wind blowing north, burning neighbors to the south more easily
+                    if neighbor_pos[2] < tree_pos[2] && rand(Uniform(1, 100)) < model.spreadChance + model.south_wind_speed
+                        neighbor.status = burning
+                    elseif neighbor_pos[2] >= tree_pos[2] && rand(Uniform(1, 100)) < model.spreadChance
+                        neighbor.status = burning
+                    end
+                # Dirección del Viento = Norte.
+                elseif model.south_wind_speed < 0 && model.west_wind_speed == 0
+                    # North wind blowing south, burning neighbors to the north more easily
+                    if neighbor_pos[2] > tree_pos[2] && rand(Uniform(1, 100)) < model.spreadChance - model.south_wind_speed
+                        neighbor.status = burning
+                    elseif neighbor_pos[2] <= tree_pos[2] && rand(Uniform(1, 100)) < model.spreadChance
+                        neighbor.status = burning
+                    end
+                # Dirección del viento = Oeste.
+                elseif model.south_wind_speed == 0 && model.west_wind_speed > 0
+                    if neighbor_pos[1] < tree_pos[1] && rand(Uniform(1, 100)) < model.spreadChance + model.west_wind_speed
+                        neighbor.status = burning
+                    elseif neighbor_pos[1] >= tree_pos[1] && rand(Uniform(1, 100)) < model.spreadChance
+                        neighbor.status = burning
+                    end
+                # Dirección del Viento = Este.
+                elseif model.south_wind_speed == 0 && model.west_wind_speed < 0
+                    # East wind blowing west, burning neighbors to the east more easily
+                    if neighbor_pos[1] > tree_pos[1] && rand(Uniform(1, 100)) < model.spreadChance - model.west_wind_speed
+                        neighbor.status = burning
+                    elseif neighbor_pos[1] <= tree_pos[1] && rand(Uniform(1, 100)) < model.spreadChance
+                        neighbor.status = burning
+                    end
+                # Dirección del Viento = Netru
+                elseif model.south_wind_speed == 0 && model.west_wind_speed == 0
+                    if rand(Uniform(1, 100)) < model.spreadChance
+                        neighbor.status =  burning
+                    else
+                        neighbor.status = green
+                    end
+                end
+            end
+        end
+        tree.status = burnt
+    end
+end
+
+# Norte/North = 1-3, Sur/South = 5-7, Oeste/West = 1,7,8,; Este/East = 3-5
+#directions = [(-1,1),(0,1),(1,1),(1,0),(1,-1),(0,-1),(-1,-1),(-1,0)]

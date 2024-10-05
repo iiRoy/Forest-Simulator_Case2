@@ -12,7 +12,7 @@ function forest_step(tree::TreeAgent, model)
     if tree.status == burning
         #Identifica árboles alrededor del agente
         for neighbor in nearby_agents(tree, model)
-            if neighbor.status == green
+            if neighbor.status == green && rand(Uniform(1,100)) < model.probability_of_spread
                 neighbor.status = burning
             end
         end
@@ -21,15 +21,15 @@ function forest_step(tree::TreeAgent, model)
 end
 
 #Density = Cantidad de agentes
-function forest_fire(; density = 0.45, griddims = (20, 20))
+function forest_fire(; density = 0.90, initialize = 5, griddims = (20, 20), probability_of_spread = 0)
+    println("Received density: ", density)
     space = GridSpaceSingle(griddims; periodic = false, metric = :manhattan)
-    forest = StandardABM(TreeAgent, space; agent_step! = forest_step, scheduler = Schedulers.Randomly())
-
+    forest = StandardABM(TreeAgent, space; agent_step! = forest_step, scheduler = Schedulers.Randomly(), properties = Dict(:probability_of_spread => probability_of_spread, :density => density, :initialize => initialize))
     for pos in positions(forest)
         if rand(Uniform(0,1)) < density
             tree = add_agent!(pos, forest)
             #Pos => Fila, == => Columna
-            if pos[2] == 5
+            if pos[2] == initialize
                 tree.status = burning
             end
         end

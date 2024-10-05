@@ -13,22 +13,34 @@ Plotly.newPlot('mydiv', [{
 
 function App() {
   let [location, setLocation] = useState("");
-  let [gridSize, setGridSize] = useState(20);
+  let [gridSize, setGridSize] = useState(40);
+  let [probability_of_spread, setProbability] = useState(1);
   let [simSpeed,setSimSpeed] = useState(2);
   let [trees, setTrees] = useState([]);
+  let [iterations, setIterations] = useState(0);
+  let [burntPerc, setBurntPerc] = useState(0);
+  let [density, setDensity] = useState(80);
+  let [sliderGridSize, setSliderGridSize] = useState(40);
 
   const burntTrees = useRef(null);
   const running = useRef(null);
 
   let setup = () => {
+    setGridSize(sliderGridSize);
     fetch("http://localhost:8000/simulations", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dim: [gridSize, gridSize] })
+      body: JSON.stringify({ 
+        dim: [sliderGridSize, sliderGridSize],
+        probability_of_spread: probability_of_spread,
+        density: density / 100
+      })
     }).then(resp => resp.json())
     .then(data => {
       setLocation(data["Location"]);
       setTrees(data["trees"]);
+      setIterations(0);
+      setBurntPerc(0);
     });
   }
 
@@ -41,6 +53,8 @@ function App() {
         let burnt = data["trees"].filter(t => t.status == "burnt").length / data["trees"].length;
         burntTrees.current.push(burnt);
         setTrees(data["trees"]);
+        setIterations(prev => prev + 1);
+        setBurntPerc((burnt * 100).toFixed(2));
       });
       }, 1000 / simSpeed);
   };
@@ -68,9 +82,15 @@ function App() {
       </ButtonGroup>
 
       <SliderField label="Grid size" min={10} max={40} step={10}
-        value={gridSize} onChange={setGridSize} />
-        <SliderField label="Simulation speed" min={1} max={30}
+        value={sliderGridSize} onChange={setSliderGridSize} />
+      <SliderField label="Simulation speed" min={1} max={30}
         value={simSpeed} onChange={setSimSpeed} />
+      <SliderField label="Spread Probability" min={0} max={100} step={1}
+        value={probability_of_spread} onChange={setProbability} />
+      <SliderField label="Density" min={0} max={100} step={10}
+        value={density} onChange={setDensity} />
+      <p>Iterations: {iterations}</p> 
+      <p>Burnt trees percentage: {burntPerc}%</p>
 
       <svg width="500" height="500" xmlns="http://www.w3.org/2000/svg" style={{backgroundColor:"white"}}>
       {

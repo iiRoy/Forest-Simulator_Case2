@@ -9,7 +9,9 @@ route("/simulations", method = POST) do
     x = payload["dim"][1]
     y = payload["dim"][2]
 
-    model = forest_fire(griddims=(x,y))
+    probability_of_spread = payload["probability_of_spread"]
+    density = payload["density"]
+    model = forest_fire(griddims=(x,y), probability_of_spread=(probability_of_spread), density =(density))
     id = string(uuid1())
     instances[id] = model
 
@@ -23,6 +25,7 @@ end
 
 route("/simulations/:id") do
     model = instances[payload(:id)]
+    
     run!(model, 1)
     trees = []
     for tree in allagents(model)
