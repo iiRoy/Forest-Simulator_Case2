@@ -93,7 +93,7 @@ function App() {
         value={simSpeed} onChange={setSimSpeed} />
       <SliderField label="Spread Probability" min={0} max={100} step={1}
         value={probability_of_spread} onChange={setProbability} />
-      <SliderField label="Density" min={0} max={100} step={10}
+      <SliderField label="Density" min={10} max={100} step={10}
         value={density} onChange={setDensity} />
       <SliderField label="South-North Wind" min={-50} max={50} step={1}
         value={south_wind_speed} onChange={setSouthWindSpeed} />
