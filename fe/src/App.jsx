@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, SliderField } from '@aws-amplify/ui-react';
+import { Button, ButtonGroup, CheckboxField, SliderField, SwitchField } from '@aws-amplify/ui-react';
 import { useRef, useState } from 'react'
 
 import '@aws-amplify/ui-react/styles.css';
@@ -23,6 +23,7 @@ function App() {
   let [sliderGridSize, setSliderGridSize] = useState(40);
   let [south_wind_speed, setSouthWindSpeed] = useState(0);
   let [west_wind_speed, setWestWindSpeed] = useState(0);
+  let [bigJumps, setBigJumps] = useState(false);
 
   const burntTrees = useRef(null);
   const running = useRef(null);
@@ -37,7 +38,8 @@ function App() {
         probability_of_spread: probability_of_spread,
         density: density / 100,
         south_wind_speed: south_wind_speed,
-        west_wind_speed: west_wind_speed
+        west_wind_speed: west_wind_speed,
+        bigJumps: bigJumps
       })
     }).then(resp => resp.json())
     .then(data => {
@@ -97,6 +99,8 @@ function App() {
         value={south_wind_speed} onChange={setSouthWindSpeed} />
       <SliderField label="West-East Wind" min={-50} max={50} step={1}
         value={west_wind_speed} onChange={setWestWindSpeed} />
+      <SwitchField label="Big Jump"
+        checked={bigJumps} onChange={(e) => setBigJumps(e.target.checked)} />
       <p>Iterations: {iterations}</p> 
       <p>Burnt trees percentage: {burntPerc}%</p>
 
